@@ -1,17 +1,16 @@
-import { Provider } from 'react-redux';
-import type { AppProps } from 'next/app';
-import {store} from "../store/store";
+const { default: AbortController } = require("abort-controller");
+const { default: fetch, Headers, Request, Response } = require("node-fetch");
 
-const AppStore = store();
+Object.assign(globalThis, {
+    fetch,
+    Headers,
+    Request,
+    Response,
+    AbortController,
+});
+const { wrapper } = require("../store/store");
 
-function MyApp({
-                   Component, pageProps,
-           }: AppProps) {
-    return (
-        <Provider store={AppStore}>
-            <Component {...pageProps} />
-        </Provider>
-    );
+export function App({ Component, pageProps }) {
+    return <Component {...pageProps} />;
 }
-
-export default MyApp;
+export default wrapper.withRedux(App);

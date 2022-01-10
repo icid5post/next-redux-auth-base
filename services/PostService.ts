@@ -1,12 +1,21 @@
-import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
-import {BaseQueryArg} from "@reduxjs/toolkit/dist/query/baseQueryTypes";
+
 import {IPost} from "../models/IPost";
+import { HYDRATE } from "next-redux-wrapper";
+import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/dist/query/react";
 
 export const postAPI = createApi({
-    reducerPath: 'postAPI',
-    baseQuery: fetchBaseQuery({baseUrl: 'https://jsonplaceholder.typicode.com'}),
-    endpoints: (build) => ({
-        fetchAllPosts: build.query<IPost[], number>({
+    baseQuery: fetchBaseQuery({
+        baseUrl: "https://jsonplaceholder.typicode.com",
+    }),
+    extractRehydrationInfo(action, { reducerPath }) {
+        if (action.type === HYDRATE) {
+            return action.payload[reducerPath]
+        }
+    },
+    tagTypes: [],
+
+    endpoints: (builder) => ({
+        fetchAllPosts: builder.query<IPost[], number>({
             query: (limit: number = 5) => ({
                 url: '/posts',
                 params: {
@@ -16,3 +25,11 @@ export const postAPI = createApi({
         })
     })
 })
+// Export hooks for usage in functional components
+export const {
+    useFetchAllPostsQuery,
+    util: { getRunningOperationPromises },
+} = postAPI;
+
+
+export const { fetchAllPosts } = postAPI.endpoints;
